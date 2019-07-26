@@ -1,4 +1,6 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -49,19 +51,23 @@ namespace PruebaTecnical.PageObjects
 
             IWebElement employee_start_working_on_1i = driver.FindElement(By.Id("employee_start_working_on_1i"));
             // Action can be performed on Input Button element
-            employee_start_working_on_1i.SendKeys("2014");
+            //employee_start_working_on_1i.SendKeys("2014");
+
+            employee_start_working_on_1i.FindElement(By.CssSelector("option[value='2015']")).Click();
+
 
             // employee_start_working_on_2i value = n
 
             IWebElement employee_start_working_on_2i = driver.FindElement(By.Id("employee_start_working_on_2i"));
             // Action can be performed on Input Button element
-            employee_start_working_on_2i.SendKeys("January");
+            employee_start_working_on_2i.FindElement(By.CssSelector("option[value='1']")).Click();
+
 
             // employee_start_working_on_3i
 
             IWebElement employee_start_working_on_3i = driver.FindElement(By.Id("employee_start_working_on_3i"));
             // Action can be performed on Input Button element
-            employee_start_working_on_3i.SendKeys("21");
+            employee_start_working_on_3i.FindElement(By.CssSelector("option[value='21']")).Click();
 
 
 

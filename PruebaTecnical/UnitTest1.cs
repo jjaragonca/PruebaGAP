@@ -1,10 +1,10 @@
-using AventStack.ExtentReports;
-using AventStack.ExtentReports.Reporter;
+
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using PruebaTecnical.PageObjects;
+using RelevantCodes.ExtentReports;
 using System;
 using System.IO;
 using System.Threading;
@@ -24,13 +24,17 @@ namespace Tests
             {
                 //To create report directory and add HTML report into it
 
-                _extent = new ExtentReports();
-                var dir = AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin\\Debug", "");
-                DirectoryInfo di = Directory.CreateDirectory(dir + "\\Test_Execution_Reports");
-                var htmlReporter = new ExtentHtmlReporter(dir + "\\Test_Execution_Reports\\Automation_Report.html");
-                _extent.AddSystemInfo("Environment", "QA");
-                _extent.AddSystemInfo("User Name", "Juan");
-                _extent.AttachReporter(htmlReporter);
+                string path = AppDomain.CurrentDomain.BaseDirectory;
+                string actualPath = path.Substring(0, path.LastIndexOf("bin"));
+                string projectPath = new Uri(actualPath).LocalPath;
+                string reportPath = projectPath + "Reports\\ReportHTML.html";
+
+                _extent = new ExtentReports(reportPath, true);
+                _extent
+                .AddSystemInfo("Host Name", "My Host")
+                .AddSystemInfo("Environment", "QA")
+                .AddSystemInfo("User Name", "Juan Aragon");
+                _extent.LoadConfig(projectPath + "extent-config.xml");
             }
             catch (Exception e)
             {
@@ -44,7 +48,7 @@ namespace Tests
         {
             try
             {
-                _test = _extent.CreateTest(TestContext.CurrentContext.Test.Name);
+                _test = _extent.StartTest("FinalReport");
                 driver = new ChromeDriver("C:\\");
                 driver.Url = "https://vacations-management.herokuapp.com/users/sign_in";
                 driver.Manage().Window.Maximize();
@@ -79,101 +83,51 @@ namespace Tests
         public void AssertExistsLogo(Boolean value)
         {
             Assert.IsTrue(value);
+            _test.Log(LogStatus.Pass, "");
         }
 
         public void AssertLoggedUserTag(String label)
         {
             Assert.IsTrue(label.Trim().ToLower().Contains("welcome"));
+            _test.Log(LogStatus.Pass, "");
+
         }
 
         public void AssertLoggedUserBanner(String label)
         {
             Assert.AreEqual(label.Trim().ToLower(), "signed in successfully.");
+            _test.Log(LogStatus.Pass, "");
+
         }
 
 
         public void AssertCreatedEmployee(String label)
         {
             Assert.AreEqual(label.Trim().ToLower(), "employee was successfully created.");
+            _test.Log(LogStatus.Pass, "");
+
         }
 
         [TearDown]
-        public void AfterTest()
+        public void GetResult()
         {
-            try
+            var status = TestContext.CurrentContext.Result.Outcome.Status;
+            var stackTrace = "<pre>" + TestContext.CurrentContext.Result.StackTrace + "</pre>";
+            var errorMessage = TestContext.CurrentContext.Result.Message;
+
+            if (status == TestStatus.Failed)
             {
-                var status = TestContext.CurrentContext.Result.Outcome.Status;
-                var stacktrace = "" +TestContext.CurrentContext.Result.StackTrace + "";
-                var errorMessage = TestContext.CurrentContext.Result.Message;
-                Status logstatus;
-                switch (status)
-                {
-                    case TestStatus.Failed:
-                        logstatus = Status.Fail;
-                        string screenShotPath = Capture(driver, TestContext.CurrentContext.Test.Name);
-                        _test.Log(logstatus, "Test ended with " +logstatus + " – " +errorMessage);
-                        _test.Log(logstatus, "Snapshot below: " +_test.AddScreenCaptureFromPath(screenShotPath));
-                        break;
-                    case TestStatus.Skipped:
-                        logstatus = Status.Skip;
-                        _test.Log(logstatus, "Test ended with " +logstatus);
-                        break;
-                    default:
-                        logstatus = Status.Pass;
-                        _test.Log(logstatus, "Test ended with " +logstatus);
-                        break;
-                }
+                _test.Log(LogStatus.Fail, stackTrace + errorMessage);
             }
-            catch (Exception e)
-            {
-                throw (e);
-            }
+            _extent.EndTest(_test);
         }
 
-        ///To flush extent report
-        ///To quit driver instance
-        /// /// Author: Sanoj
-        /// Since: 23-Sep-2018
         [OneTimeTearDown]
-        public void AfterClass()
+        public void EndReport()
         {
-            try
-            {
-                _extent.Flush();
-            }
-            catch (Exception e)
-            {
-                throw (e);
-            }
-            driver.Quit();
+            _extent.Flush();
+            _extent.Close();
         }
-
-        /// To capture the screenshot for extent report and return actual file path
-        /// Author: Sanoj
-        /// Since: 23-Sep-2018
-        private string Capture(IWebDriver driver, string screenShotName)
-        {
-            string localpath = "";
-            try
-            {
-                Thread.Sleep(4000);
-                ITakesScreenshot ts = (ITakesScreenshot)driver;
-                Screenshot screenshot = ts.GetScreenshot();
-                string pth = System.Reflection.Assembly.GetCallingAssembly().CodeBase;
-                var dir = AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin\\Debug", "");
-                DirectoryInfo di = Directory.CreateDirectory(dir + "\\Defect_Screenshots\\");
-                string finalpth = pth.Substring(0, pth.LastIndexOf("bin")) + "\\Defect_Screenshots\\" +screenShotName + ".png";
-                localpath = new Uri(finalpth).LocalPath;
-                screenshot.SaveAsFile(localpath);
-
-            }
-            catch (Exception e)
-            {
-                throw (e);
-            }
-            return localpath;
-        }
-
 
     }
 }
