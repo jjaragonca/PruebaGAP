@@ -53,7 +53,7 @@ namespace PruebaTecnical.PageObjects
             // Action can be performed on Input Button element
             //employee_start_working_on_1i.SendKeys("2014");
 
-            employee_start_working_on_1i.FindElement(By.CssSelector("option[value='2015']")).Click();
+            employee_start_working_on_1i.FindElement(By.CssSelector("option[value='2014']")).Click();
 
 
             // employee_start_working_on_2i value = n
