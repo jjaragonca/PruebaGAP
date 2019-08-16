@@ -9,8 +9,8 @@ using System.IO;
 using System.Threading;
 using System.Security;
 using System.Security.Authentication;
-using AventStack.ExtentReports;
-using AventStack.ExtentReports.Reporter;
+//using AventStack.ExtentReports;
+//using AventStack.ExtentReports.Reporter;
 using System.Net.NetworkInformation;
 
 namespace Tests
@@ -19,8 +19,8 @@ namespace Tests
     {
         IWebDriver driver;
         String dir;
-              protected ExtentReports _extent;
-            protected ExtentTest _test;
+       //       protected ExtentReports _extent;
+       //     protected ExtentTest _test;
 
         [OneTimeSetUp]
         public void BeforeClass()
@@ -29,14 +29,14 @@ namespace Tests
             {
                 //To create report directory and add HTML report into it
 
-                _extent = new ExtentReports();
+             ///   _extent = new ExtentReports();
                 dir = AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin\\Debug", "");
                 DirectoryInfo di = Directory.CreateDirectory(dir + "\\Test_Execution_Reports");
                 
-                var htmlReporter = new ExtentHtmlReporter(dir + "\\Test_Execution_Reports" + "\\Automation_Report" + ".html");
+           /*     var htmlReporter = new ExtentHtmlReporter(dir + "\\Test_Execution_Reports" + "\\Automation_Report" + ".html");
                 _extent.AddSystemInfo("Environment", "Journey of Quality");
                 _extent.AddSystemInfo("User Name", "Juan");
-                _extent.AttachReporter(htmlReporter);
+                _extent.AttachReporter(htmlReporter);*/
             }
             catch (Exception e)
             {
@@ -51,7 +51,7 @@ namespace Tests
         {
             try
             {
-                _test = _extent.CreateTest(TestContext.CurrentContext.Test.Name);
+             //   _test = _extent.CreateTest(TestContext.CurrentContext.Test.Name);
 
                 driver = new ChromeDriver(dir + "..\\chromedriver");
                 driver.Url = "https://vacations-management.herokuapp.com/users/sign_in";
@@ -120,14 +120,14 @@ namespace Tests
                 {
                     case TestStatus.Failed:
                         string screenShotPath = Capture(driver, TestContext.CurrentContext.Test.Name);
-                        _test.Log(Status.Fail, "Test ended with Fail" + " – " +errorMessage);
-                        _test.Log(Status.Fail, "Snapshot below: " +_test.AddScreenCaptureFromPath(screenShotPath));
+                     //   _test.Log(Status.Fail, "Test ended with Fail" + " – " +errorMessage);
+                      ////  _test.Log(Status.Fail, "Snapshot below: " +_test.AddScreenCaptureFromPath(screenShotPath));
                         break;
                     case TestStatus.Skipped:
-                        _test.Log(Status.Skip, "Test ended with Skipped");
+                     //   _test.Log(Status.Skip, "Test ended with Skipped");
                         break;
                     default:
-                        _test.Log(Status.Pass, "Test ended with Succesful" );
+                     //   _test.Log(Status.Pass, "Test ended with Succesful" );
                         break;
                 }
             }
@@ -146,11 +146,10 @@ namespace Tests
         {
             try
             {
-                _extent.Flush();
+            //    _extent.Flush();
             }
             catch (Exception e)
             {
-                throw (e); // 
             }
             driver.Quit();
         }
